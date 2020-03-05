@@ -4,6 +4,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileWriter;
 
+/*
+    TERMINAL COMMANDS TO COMPILE AND RUN:
+    javac -cp .:postgresql-42.2.8.jar Phase4GUI.java
+
+    java -cp .:postgresql-42.2.8.jar Phase4GUI
+
+*/
+
 public class Phase4GUI extends javax.swing.JFrame {
     // Global Variables Declared for Phase 3
     private String drop1Global;
