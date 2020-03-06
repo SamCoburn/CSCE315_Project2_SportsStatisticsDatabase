@@ -9,7 +9,6 @@ import java.io.FileWriter;
     javac -cp .:postgresql-42.2.8.jar Phase4GUI.java
 
     java -cp .:postgresql-42.2.8.jar Phase4GUI
-
 */
 
 public class Phase4GUI extends javax.swing.JFrame {
@@ -433,6 +432,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             String firstName = "";
             String lastName = "";
             String name = "";
+            int lineCount = 0;
             try{
                 //create a statement object
                 Statement stmt = conn.createStatement();
@@ -444,13 +444,29 @@ public class Phase4GUI extends javax.swing.JFrame {
                 while (result.next()) {
                     firstName = result.getString("First Name ");
                     lastName = result.getString("Last Name");
-                    name += firstName + " " + lastName + "\n";   
+                    name += firstName + " " + lastName + "\n";  
+                    lineCount++; 
                 }
             } catch (Exception e){
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
             }
 
-            if(outputFile.isSelected())
+            if ((lineCount > 20) & !(outputFile.isSelected())) {
+                try{
+                    FileWriter fw = new FileWriter("output.txt");
+                    fw.write(name);
+                    fw.close();
+                }
+                catch(Exception e)
+                {
+                    System.out.println("Error writing to output file");
+                }
+                    System.out.println("Query Output Too Large To Display");
+                    System.out.println("Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Query Output Too Large To Display \n Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Success writing to output file");
+            }
+            else if(outputFile.isSelected())
             {
                 fileOutputGlobal=true;
                 try{
@@ -579,6 +595,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             sql = "SELECT " + select + " FROM " + from + " WHERE " + where + ";";
             System.out.println(sql);
             String teamName = "";
+            int lineCount = 0;
             try{
                 //create a statement object
                 Statement stmt = conn.createStatement();
@@ -589,14 +606,29 @@ public class Phase4GUI extends javax.swing.JFrame {
                 //System.out.println("______________________________________");
                 while (result.next()) {
                     teamName += result.getString("name") + "\n";
+                    lineCount++;
                 }
             } catch (Exception e){
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
             }
 
             // If output too large, automatically write to a file 
-
-            if(outputFile.isSelected())
+            if ((lineCount > 20) & !(outputFile.isSelected())) {
+                try{
+                    FileWriter fw = new FileWriter("output.txt");
+                    fw.write(teamName);
+                    fw.close();
+                }
+                catch(Exception e)
+                {
+                    System.out.println("Error writing to output file");
+                }
+                    System.out.println("Query Output Too Large To Display");
+                    System.out.println("Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Query Output Too Large To Display \n Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Success writing to output file");
+            }
+            else if(outputFile.isSelected())
             {
                 fileOutputGlobal=true;
                 try{
