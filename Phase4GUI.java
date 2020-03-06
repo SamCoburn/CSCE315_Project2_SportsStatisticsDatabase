@@ -667,18 +667,15 @@ public class Phase4GUI extends javax.swing.JFrame {
     }
 
     private void textBoxActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        // TODO add your handling code here:
         String parameter = textBox.getText();
         parameterGlobal = parameter;
     }                                       
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {                                             
-        // TODO add your handling code here:
         search();
     }                                            
 
     private void drop1ActionPerformed(java.awt.event.ActionEvent evt) {                                      
-        // TODO add your handling code here:
         javax.swing.JComboBox combo = (javax.swing.JComboBox) evt.getSource();
         String drop1 = (String) combo.getSelectedItem();
 
@@ -697,76 +694,63 @@ public class Phase4GUI extends javax.swing.JFrame {
     }                                     
 
     private void drop2ActionPerformed(java.awt.event.ActionEvent evt) {                                      
-        // TODO add your handling code here:
         javax.swing.JComboBox combo = (javax.swing.JComboBox) evt.getSource();
         String drop2 = (String) combo.getSelectedItem();
         drop2Global = drop2;
     }                                     
 
     private void outputFileActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
         fileOutputGlobal = outputFile.isSelected();
     }                                          
 
     private void Question1TeamOneActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
         String team = Question1TeamOne.getText();
         q1Team1 = team;
     }                                                
 
     private void Question1Team2ActionPerformed(java.awt.event.ActionEvent evt) {                                               
-        // TODO add your handling code here:
         String team = Question1Team2.getText();
         q1Team2 = team;
     }                                              
 
     private void Question2PlayerOneActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-        // TODO add your handling code here:
         String player = Question2PlayerOne.getText();
         q2Player1 = player;
     }                                                  
 
     private void Question2PlayerTwoActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-        // TODO add your handling code here:
         String player = Question2PlayerTwo.getText();
         q2Player2 = player;
     }                                                  
 
     private void Question3TeamActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        // TODO add your handling code here:
         String team = Question3Team.getText();
         q3Team = team;
     }                                             
 
     private void Question4ConferenceActionPerformed(java.awt.event.ActionEvent evt) {                                                    
-        // TODO add your handling code here:
         String conference = Question4Conference.getText();
         q4Conference = conference;
     }                                                   
 
     private void Question4SeasonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
         String season = Question4Season.getText();
         q4Season = season;
     }                                               
 
     private void Question1ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
         questionOne();
     }                                               
 
     private void Question2ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
         questionTwo();
     }                                               
 
     private void Question3ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
         questionThree();
     }                                               
 
     private void Question4ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
         questionFour();
     }                                               
 
@@ -774,11 +758,6 @@ public class Phase4GUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
