@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileWriter;
+import java.util.*;
 
 /*
     TERMINAL COMMANDS TO COMPILE AND RUN:
@@ -659,7 +660,153 @@ public class Phase4GUI extends javax.swing.JFrame {
     }
 
     private void questionThree() {
+        String team = q3Team;
 
+        // Write command to get team code from database
+        String teamCodeCommand = "SELECT DISTINCT \"team code\" FROM team WHERE (\"name\" = \'" + q3Team +"\');";
+        String teamCode = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(teamCodeCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                teamCode = result.getString("team code");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }   
+
+        // Write command to get game codes from database
+        String gameCodeCommand = "SELECT DISTINCT \"Game Code\" FROM game WHERE (\"Home Team Code\" = " + teamCode + ") OR (\"Visit Team Code\" = " + teamCode + ");";
+        String gameCode = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(gameCodeCommand);
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                gameCode += result.getString("game code") + " ";
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }  
+
+        
+        String[] codes = gameCode.split(" ");
+        String opposingTeamsResult = "";
+        for (int i = 0; i < codes.length; i++) {
+            String opposingTeamCodeCommand = "SELECT DISTINCT \"Visit Team Code\", \"Home Team Code\" FROM game WHERE (\"Game Code\" = " + codes[i] + ");";
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(opposingTeamCodeCommand);
+                //OUTPUT
+                //System.out.println("______________________________________");
+                while (result.next()) {
+                    String visitTeamCode = result.getString("Visit Team Code");
+                    String homeTeamCode = result.getString("Home Team Code");
+
+                    if (!visitTeamCode.equals(teamCode)) {
+                        opposingTeamsResult += visitTeamCode + " ";
+                    }
+                    if (!homeTeamCode.equals(teamCode)) {
+                        opposingTeamsResult += homeTeamCode + " ";
+                    }
+                }
+            } catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            } 
+        }
+
+        String[] opposingTeams = opposingTeamsResult.split(" ");
+        String rushYardsResult = "";
+        for (int i = 0; i < opposingTeams.length; i++) {
+            String rushYardsCommand = "SELECT DISTINCT \"Rush Yard\" FROM \"Team Game Statistics\" WHERE (\"Game Code\" = " + codes[i] + ") AND (\"Team Code\" = " + opposingTeams[i] + ");";
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(rushYardsCommand);
+                //OUTPUT
+                //System.out.println("______________________________________");
+                while (result.next()) {
+                    rushYardsResult += result.getString("Rush Yard") + " ";
+                }
+            } catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            }
+        }
+
+        String[] rushYards = rushYardsResult.split(" ");
+        int maxIndex = 0;
+        int maxRushYards = 0;
+        for (int i = 0; i < rushYards.length; i++) {
+            int currentYards = Integer.valueOf(rushYards[i]);
+            if (currentYards > maxRushYards) {
+                maxRushYards = currentYards;
+                maxIndex = i;
+            }
+        }
+        
+        String maxTeam = opposingTeams[maxIndex];
+        
+        String maxTeamNameCommand = "SELECT DISTINCT \"name\" FROM \"team\" WHERE (\"team code\" = " + maxTeam + ");";
+        String searchTeamNameCommand = "SELECT DISTINCT \"name\" FROM \"team\" WHERE (\"team code\" = " + teamCode + ");";
+        String maxSeasonCommand = "SELECT DISTINCT \"Season\" FROM \"game\" WHERE (\"Game Code\" = " + codes[maxIndex] + ");";
+        String maxTeamName = "";
+        String searchTeamName = "";
+        String maxSeason = "";
+
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(maxTeamNameCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                maxTeamName = result.getString("name");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(searchTeamNameCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                searchTeamName = result.getString("name");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(maxSeasonCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                maxSeason = result.getString("Season");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+
+        System.out.println(searchTeamName);
+        System.out.println(maxTeamName);
+        System.out.println(maxSeason);
+
+        JOptionPane.showMessageDialog(null, maxTeamName + " had the most rushing yards against " + searchTeamName + " in " + maxSeason + " with " + maxRushYards + " yards.");
     }
 
     private void questionFour() {
