@@ -663,7 +663,7 @@ public class Phase4GUI extends javax.swing.JFrame {
         String team = q3Team;
 
         // Write command to get team code from database
-        String teamCodeCommand = "SELECT DISTINCT \"team code\" FROM team WHERE (\"name\" = \'" + q3Team +"\');";
+        String teamCodeCommand = "SELECT DISTINCT \"team code\" FROM team WHERE (\"name\" = \'" + team +"\');";
         String teamCode = "";
         try{
             //create a statement object
@@ -694,9 +694,9 @@ public class Phase4GUI extends javax.swing.JFrame {
         } catch (Exception e){
             JOptionPane.showMessageDialog(null,"Error accessing Database.");
         }  
+        String[] codes = gameCode.split(" "); // Create an array of game codes
 
-        
-        String[] codes = gameCode.split(" ");
+        // Get all of the team codes (excluding the searched team) for each individual game code
         String opposingTeamsResult = "";
         for (int i = 0; i < codes.length; i++) {
             String opposingTeamCodeCommand = "SELECT DISTINCT \"Visit Team Code\", \"Home Team Code\" FROM game WHERE (\"Game Code\" = " + codes[i] + ");";
@@ -722,8 +722,9 @@ public class Phase4GUI extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
             } 
         }
-
         String[] opposingTeams = opposingTeamsResult.split(" ");
+
+        // Find all the rushing yards for each team against the searched team
         String rushYardsResult = "";
         for (int i = 0; i < opposingTeams.length; i++) {
             String rushYardsCommand = "SELECT DISTINCT \"Rush Yard\" FROM \"Team Game Statistics\" WHERE (\"Game Code\" = " + codes[i] + ") AND (\"Team Code\" = " + opposingTeams[i] + ");";
@@ -741,8 +742,9 @@ public class Phase4GUI extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
             }
         }
-
         String[] rushYards = rushYardsResult.split(" ");
+
+        // Find the team with the max rush yards 
         int maxIndex = 0;
         int maxRushYards = 0;
         for (int i = 0; i < rushYards.length; i++) {
@@ -752,9 +754,9 @@ public class Phase4GUI extends javax.swing.JFrame {
                 maxIndex = i;
             }
         }
-        
         String maxTeam = opposingTeams[maxIndex];
         
+        // Get the names of the teams involved in the final statement and the year the game was played
         String maxTeamNameCommand = "SELECT DISTINCT \"name\" FROM \"team\" WHERE (\"team code\" = " + maxTeam + ");";
         String searchTeamNameCommand = "SELECT DISTINCT \"name\" FROM \"team\" WHERE (\"team code\" = " + teamCode + ");";
         String maxSeasonCommand = "SELECT DISTINCT \"Season\" FROM \"game\" WHERE (\"Game Code\" = " + codes[maxIndex] + ");";
@@ -802,10 +804,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null,"Error accessing Database.");
         }
 
-        System.out.println(searchTeamName);
-        System.out.println(maxTeamName);
-        System.out.println(maxSeason);
-
+        // Display query results to the user of the application
         JOptionPane.showMessageDialog(null, maxTeamName + " had the most rushing yards against " + searchTeamName + " in " + maxSeason + " with " + maxRushYards + " yards.");
     }
 
