@@ -6,6 +6,13 @@ import java.io.FileWriter;
 import java.util.*;
 import java.io.*;
 
+/*
+    TERMINAL COMMANDS TO COMPILE AND RUN:
+    javac -cp .:postgresql-42.2.8.jar Phase4GUI.java
+
+    java -cp .:postgresql-42.2.8.jar Phase4GUI
+*/
+
 public class Phase4GUI extends javax.swing.JFrame {
     // Global Variables Declared for Phase 3
     private String drop1Global;
@@ -21,13 +28,13 @@ public class Phase4GUI extends javax.swing.JFrame {
     private String q3Team;
     private String q4Conference;
     private String q4Season;
-    
+
     public Phase4GUI() {
         initComponents();
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
@@ -328,7 +335,7 @@ public class Phase4GUI extends javax.swing.JFrame {
 
         pack();
     }
-    
+
     private void search() {
         String select = "";
         String from = "";
@@ -376,7 +383,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         }
                         else {
                             where += "team.\"season\" = " + splitOnOr[i] + ") OR (";
-                        }   
+                        }
                     }
                 }
                 else {
@@ -414,7 +421,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         }
                         else {
                             where += "team.\"name\" = \'" + splitOnOr[i] + "\') OR (";
-                        }   
+                        }
                     }
                 }
                 else {
@@ -427,6 +434,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             String firstName = "";
             String lastName = "";
             String name = "";
+            int lineCount = 0;
             try{
                 //create a statement object
                 Statement stmt = conn.createStatement();
@@ -438,13 +446,29 @@ public class Phase4GUI extends javax.swing.JFrame {
                 while (result.next()) {
                     firstName = result.getString("First Name ");
                     lastName = result.getString("Last Name");
-                    name += firstName + " " + lastName + "\n";   
+                    name += firstName + " " + lastName + "\n";
+                    lineCount++;
                 }
             } catch (Exception e){
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
             }
 
-            if(outputFile.isSelected())
+            if ((lineCount > 20) & !(outputFile.isSelected())) {
+                try{
+                    FileWriter fw = new FileWriter("output.txt");
+                    fw.write(name);
+                    fw.close();
+                }
+                catch(Exception e)
+                {
+                    System.out.println("Error writing to output file");
+                }
+                    System.out.println("Query Output Too Large To Display");
+                    System.out.println("Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Query Output Too Large To Display \n Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Success writing to output file");
+            }
+            else if(outputFile.isSelected())
             {
                 fileOutputGlobal=true;
                 try{
@@ -497,7 +521,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         }
                         else {
                             where += "team.\"season\" = " + splitOnOr[i] + ") OR (";
-                        }   
+                        }
                     }
                 }
                 else {
@@ -513,7 +537,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                 // Check for & or |
                 // Should only be able to find people based on Full Name (for now)
                 if (userInput.contains("&")) {
-                    // For AND, Union two separate sql queries 
+                    // For AND, Union two separate sql queries
                     String[] splitOnAnd = userInput.split("& ");
                     String splitOnAndString  = "";
                     for(int i = 0; i < splitOnAnd.length; i++)
@@ -521,7 +545,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         splitOnAndString += splitOnAnd[i];
                     }
                     String[] splitOnSpace = splitOnAndString.split(" ");
-                    
+
                     for (int i = 0; i < splitOnSpace.length; i=i+2) {
                         if (i+2 == splitOnSpace.length) {
                             where += "player.\"First Name \" = \'" + splitOnSpace[i] + "\') AND (player.\"Last Name\" = \'"+ splitOnSpace[i+1] + "\')";
@@ -529,7 +553,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         else {
                             select += " FROM team, player WHERE (team.\"team code\" = player.\"Team Code\") AND (";
                             select += "player.\"First Name \" = \'" + splitOnSpace[i] + "\') AND (";
-                            select += "player.\"Last Name\" = \'" + splitOnSpace[i+1] + "\') UNION SELECT DISTINCT"; 
+                            select += "player.\"Last Name\" = \'" + splitOnSpace[i+1] + "\') UNION SELECT DISTINCT";
                             select += " team.\"name\"";
                         }
                     }
@@ -544,7 +568,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         splitOnOrString += splitOnOr[i];
                     }
 
-                    String[] splitOnSpace = splitOnOrString.split("[ ]+"); 
+                    String[] splitOnSpace = splitOnOrString.split("[ ]+");
 
                     for (int i = 0; i < splitOnSpace.length; i++) {
                         if (i == splitOnSpace.length - 1) {
@@ -555,13 +579,13 @@ public class Phase4GUI extends javax.swing.JFrame {
                         }
                         else {
                             where += "player.\"Last Name\" = \'" + splitOnSpace[i] + "\')) OR (";
-                        }   
+                        }
                     }
                 }
                 else {
                     String space = " ";
-                    String[] splitOnSpace = userInput.split(space); 
-                    
+                    String[] splitOnSpace = userInput.split(space);
+
                     String firstName = splitOnSpace[0];
                     String lastName = splitOnSpace[1];
 
@@ -573,6 +597,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             sql = "SELECT " + select + " FROM " + from + " WHERE " + where + ";";
             System.out.println(sql);
             String teamName = "";
+            int lineCount = 0;
             try{
                 //create a statement object
                 Statement stmt = conn.createStatement();
@@ -583,14 +608,29 @@ public class Phase4GUI extends javax.swing.JFrame {
                 //System.out.println("______________________________________");
                 while (result.next()) {
                     teamName += result.getString("name") + "\n";
+                    lineCount++;
                 }
             } catch (Exception e){
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
             }
 
-            // If output too large, automatically write to a file 
-
-            if(outputFile.isSelected())
+            // If output too large, automatically write to a file
+            if ((lineCount > 20) & !(outputFile.isSelected())) {
+                try{
+                    FileWriter fw = new FileWriter("output.txt");
+                    fw.write(teamName);
+                    fw.close();
+                }
+                catch(Exception e)
+                {
+                    System.out.println("Error writing to output file");
+                }
+                    System.out.println("Query Output Too Large To Display");
+                    System.out.println("Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Query Output Too Large To Display \n Writing Query Output To File");
+                    JOptionPane.showMessageDialog(null, "Success writing to output file");
+            }
+            else if(outputFile.isSelected())
             {
                 fileOutputGlobal=true;
                 try{
@@ -615,12 +655,12 @@ public class Phase4GUI extends javax.swing.JFrame {
     private String findChain(String team1, String team2,String str)
     {
         ArrayList<String> leftmiddleList = new ArrayList<String>();
-        ArrayList<String> rightmiddleList = new ArrayList<String>(); 
+        ArrayList<String> rightmiddleList = new ArrayList<String>();
 
         StringBuilder temp = new StringBuilder ();
         temp.append(str);
         if(!victoryChain(team1, team2, temp))
-        {           
+        {
             for(int i = gamecodeList.size()-1;i>=0;i--)
             {
                 boolean foundVictoryChain = false;
@@ -634,7 +674,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                     if(foundVictoryChain)
                     {
                         foundTheConnection = true;
-                        return team1 + " beat " + team2List.get(i) + " "+ seasonList.get(i) + ", "+temp.toString();                        
+                        return team1 + " beat " + team2List.get(i) + " "+ seasonList.get(i) + ", "+temp.toString();
                     }
                 }
                 if(team2List.get(i).equals(team2))
@@ -664,7 +704,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             for(int i = 0;i<leftmiddleList.size();i++)
             {
                 for(int j = 0; i<rightmiddleList.size();i++)
-                {      
+                {
                     victoryChain(team1,leftmiddleList.get(i),temp);
                     temp.append(findChain(leftmiddleList.get(i),rightmiddleList.get(i),temp.toString()));
                     victoryChain(rightmiddleList.get(i),team2,temp);
@@ -705,7 +745,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             {
                 team1List.set(index,"nullvalue");
                 index = team1List.lastIndexOf(team1);
-            }            
+            }
         }
 
         index = team1List.lastIndexOf("nullvalue");
@@ -717,7 +757,7 @@ public class Phase4GUI extends javax.swing.JFrame {
 
         if(found)
         {
-            return true;          
+            return true;
         }
         return false;
     }
@@ -725,11 +765,11 @@ public class Phase4GUI extends javax.swing.JFrame {
     private ArrayList<String> team1List = new ArrayList<String>();
     private ArrayList<String> team2List = new ArrayList<String>();
     private ArrayList<Integer> offptsList = new ArrayList<Integer>();
-    private ArrayList<Integer> defptsList = new ArrayList<Integer>();       
+    private ArrayList<Integer> defptsList = new ArrayList<Integer>();
     private ArrayList<String> seasonList = new ArrayList<String>();
     private boolean foundTheConnection = false;
 
-    private void questionOne() 
+    private void questionOne()
     {
         System.out.println("Searching for connection: "+ q1Team1 + " vs " + q1Team2);
         //creating the arraylists
@@ -737,7 +777,7 @@ public class Phase4GUI extends javax.swing.JFrame {
         {
             String querry = "WITH CTE (\"Game Code \", \"name\", \"conference code\", \"name dup\", \"conference code dup\", \"Offense Points\",\"Defense Points\", \"Season\", DuplicateCount) ";
             querry +="AS (SELECT \"Game Code \", \"name\", \"conference code\", \"name dup\", \"conference code dup\", \"Offense Points\",\"Defense Points\", \"Season\",";
-            querry +="ROW_NUMBER() OVER(PARTITION BY \"Game Code \", \"name\", \"name dup\",\"Season\" ORDER BY \"Offense Points\" DESC,\"Defense Points\" DESC) AS DuplicateCount FROM gameinfo3) "; 
+            querry +="ROW_NUMBER() OVER(PARTITION BY \"Game Code \", \"name\", \"name dup\",\"Season\" ORDER BY \"Offense Points\" DESC,\"Defense Points\" DESC) AS DuplicateCount FROM gameinfo3) ";
             querry +="SELECT * from CTE Where DuplicateCount = 1 ORDER BY \"Season\" ASC,\"Game Code \"ASC;";
 
             System.out.println(querry);
@@ -759,8 +799,8 @@ public class Phase4GUI extends javax.swing.JFrame {
                 String defpts = "";
                 String season = "";
 
-                while (result.next()) 
-                {    
+                while (result.next())
+                {
                     gamecode = result.getString("Game Code ");
                     team1 = result.getString("name");
                     team2 = result.getString("name dup");
@@ -769,7 +809,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                     season = result.getString("Season");
 
                     if(Integer.parseInt(offpts)<Integer.parseInt(defpts))
-                    {      
+                    {
                         gamecodeList.add(Long.parseLong(gamecode));
                         team1List.add(team2);
                         team2List.add(team1);
@@ -779,7 +819,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                         output += String.format("%-30s %-25s %-25s %-5s %-5s %-4s\n",gamecode,team2,team1,defpts,offpts,season);
                     }
                     else
-                    {                   
+                    {
                         gamecodeList.add(Long.parseLong(gamecode));
                         team1List.add(team1);
                         team2List.add(team2);
@@ -793,7 +833,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             }
             catch (Exception e){
                 JOptionPane.showMessageDialog(null,"Error accessing Database.");
-            }            
+            }
             for(int i = gamecodeList.size()-1;i>0;i--)
             {
                 //first checks if gamecode, season, teamnames are the same
@@ -830,8 +870,8 @@ public class Phase4GUI extends javax.swing.JFrame {
                         seasonList.remove(i);
                     }
                 }
-            }  
-            //removes all the ties 
+            }
+            //removes all the ties
             for(int i = gamecodeList.size()-1;i>0;i--)
             {
                 if(offptsList.get(i) == defptsList.get(i))
@@ -841,7 +881,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                     team2List.remove(i);
                     offptsList.remove(i);
                     defptsList.remove(i);
-                    seasonList.remove(i);                   
+                    seasonList.remove(i);
                 }
             }
 
@@ -849,11 +889,11 @@ public class Phase4GUI extends javax.swing.JFrame {
             for(int i =0;i<gamecodeList.size();i++)
             {
                 writeToFile += gamecodeList.get(i) + "," + team1List.get(i) + "," + team2List.get(i) + "," + offptsList.get(i) + "," + defptsList.get(i) + "," + seasonList.get(i)+"\n";
-            }            
+            }
             try (PrintWriter writer = new PrintWriter(new File("test.csv"))) {
 
                 writer.write(writeToFile);
-            } 
+            }
             catch (FileNotFoundException e) {
                 System.out.println(e.getMessage());
             }
@@ -871,7 +911,7 @@ public class Phase4GUI extends javax.swing.JFrame {
             output = "Team 2 name is invalid";
             System.out.println("Team 2 name is invalid");
         }
-        else 
+        else
         {
             //both teams are valid
             boolean found = false;
@@ -888,19 +928,19 @@ public class Phase4GUI extends javax.swing.JFrame {
                 }
             }
             if(!found)
-            {            
+            {
                 //checks for indirect connection
                 output = findChain(q1Team1,q1Team2,"");
-                System.out.println(output);            
+                System.out.println(output);
             }
             //System.out.println(gamecodeList.size());
-            
+
         }
         foundTheConnection = false;
         JOptionPane.showMessageDialog(null,output);
 
 
-        
+
 
     }
 
@@ -910,26 +950,168 @@ public class Phase4GUI extends javax.swing.JFrame {
     }
 
     private void questionThree() {
+        String team = q3Team;
 
+        // Write command to get team code from database
+        String teamCodeCommand = "SELECT DISTINCT \"team code\" FROM team WHERE (\"name\" = \'" + team +"\');";
+        String teamCode = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(teamCodeCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                teamCode = result.getString("team code");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+
+        // Write command to get game codes from database
+        String gameCodeCommand = "SELECT DISTINCT \"Game Code\" FROM game WHERE (\"Home Team Code\" = " + teamCode + ") OR (\"Visit Team Code\" = " + teamCode + ");";
+        String gameCode = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(gameCodeCommand);
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                gameCode += result.getString("game code") + " ";
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+        String[] codes = gameCode.split(" "); // Create an array of game codes
+
+        // Get all of the team codes (excluding the searched team) for each individual game code
+        String opposingTeamsResult = "";
+        for (int i = 0; i < codes.length; i++) {
+            String opposingTeamCodeCommand = "SELECT DISTINCT \"Visit Team Code\", \"Home Team Code\" FROM game WHERE (\"Game Code\" = " + codes[i] + ");";
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(opposingTeamCodeCommand);
+                //OUTPUT
+                //System.out.println("______________________________________");
+                while (result.next()) {
+                    String visitTeamCode = result.getString("Visit Team Code");
+                    String homeTeamCode = result.getString("Home Team Code");
+
+                    if (!visitTeamCode.equals(teamCode)) {
+                        opposingTeamsResult += visitTeamCode + " ";
+                    }
+                    if (!homeTeamCode.equals(teamCode)) {
+                        opposingTeamsResult += homeTeamCode + " ";
+                    }
+                }
+            } catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            }
+        }
+        String[] opposingTeams = opposingTeamsResult.split(" ");
+
+        // Find all the rushing yards for each team against the searched team
+        String rushYardsResult = "";
+        for (int i = 0; i < opposingTeams.length; i++) {
+            String rushYardsCommand = "SELECT DISTINCT \"Rush Yard\" FROM \"Team Game Statistics\" WHERE (\"Game Code\" = " + codes[i] + ") AND (\"Team Code\" = " + opposingTeams[i] + ");";
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(rushYardsCommand);
+                //OUTPUT
+                //System.out.println("______________________________________");
+                while (result.next()) {
+                    rushYardsResult += result.getString("Rush Yard") + " ";
+                }
+            } catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            }
+        }
+        String[] rushYards = rushYardsResult.split(" ");
+
+        // Find the team with the max rush yards
+        int maxIndex = 0;
+        int maxRushYards = 0;
+        for (int i = 0; i < rushYards.length; i++) {
+            int currentYards = Integer.valueOf(rushYards[i]);
+            if (currentYards > maxRushYards) {
+                maxRushYards = currentYards;
+                maxIndex = i;
+            }
+        }
+        String maxTeam = opposingTeams[maxIndex];
+
+        // Get the names of the teams involved in the final statement and the year the game was played
+        String maxTeamNameCommand = "SELECT DISTINCT \"name\" FROM \"team\" WHERE (\"team code\" = " + maxTeam + ");";
+        String searchTeamNameCommand = "SELECT DISTINCT \"name\" FROM \"team\" WHERE (\"team code\" = " + teamCode + ");";
+        String maxSeasonCommand = "SELECT DISTINCT \"Season\" FROM \"game\" WHERE (\"Game Code\" = " + codes[maxIndex] + ");";
+        String maxTeamName = "";
+        String searchTeamName = "";
+        String maxSeason = "";
+
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(maxTeamNameCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                maxTeamName = result.getString("name");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(searchTeamNameCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                searchTeamName = result.getString("name");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(maxSeasonCommand);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            while (result.next()) {
+                maxSeason = result.getString("Season");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database.");
+        }
+
+        // Display query results to the user of the application
+        JOptionPane.showMessageDialog(null, maxTeamName + " had the most rushing yards against " + searchTeamName + " in " + maxSeason + " with " + maxRushYards + " yards.");
     }
 
     private void questionFour() {
 
     }
 
-    private void textBoxActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        // TODO add your handling code here:
+    private void textBoxActionPerformed(java.awt.event.ActionEvent evt) {
         String parameter = textBox.getText();
         parameterGlobal = parameter;
-    }                                       
+    }
 
-    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {                                             
-        // TODO add your handling code here:
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {
         search();
-    }                                            
+    }
 
-    private void drop1ActionPerformed(java.awt.event.ActionEvent evt) {                                      
-        // TODO add your handling code here:
+    private void drop1ActionPerformed(java.awt.event.ActionEvent evt) {
         javax.swing.JComboBox combo = (javax.swing.JComboBox) evt.getSource();
         String drop1 = (String) combo.getSelectedItem();
 
@@ -942,94 +1124,76 @@ public class Phase4GUI extends javax.swing.JFrame {
         }
         else if (drop1 == "Team") {
             drop1Global = "Team";
-            drop2.addItem("Season"); 
+            drop2.addItem("Season");
             drop2.addItem("Player");
         }
-    }                                     
+    }
 
-    private void drop2ActionPerformed(java.awt.event.ActionEvent evt) {                                      
-        // TODO add your handling code here:
+    private void drop2ActionPerformed(java.awt.event.ActionEvent evt) {
         javax.swing.JComboBox combo = (javax.swing.JComboBox) evt.getSource();
         String drop2 = (String) combo.getSelectedItem();
         drop2Global = drop2;
-    }                                     
+    }
 
-    private void outputFileActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
+    private void outputFileActionPerformed(java.awt.event.ActionEvent evt) {
         fileOutputGlobal = outputFile.isSelected();
-    }                                          
+    }
 
-    private void Question1TeamOneActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+    private void Question1TeamOneActionPerformed(java.awt.event.ActionEvent evt) {
         String team = Question1TeamOne.getText();
         q1Team1 = team;
-    }                                                
+    }
 
-    private void Question1Team2ActionPerformed(java.awt.event.ActionEvent evt) {                                               
-        // TODO add your handling code here:
+    private void Question1Team2ActionPerformed(java.awt.event.ActionEvent evt) {
         String team = Question1Team2.getText();
         q1Team2 = team;
-    }                                              
+    }
 
-    private void Question2PlayerOneActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-        // TODO add your handling code here:
+    private void Question2PlayerOneActionPerformed(java.awt.event.ActionEvent evt) {
         String player = Question2PlayerOne.getText();
         q2Player1 = player;
-    }                                                  
+    }
 
-    private void Question2PlayerTwoActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-        // TODO add your handling code here:
+    private void Question2PlayerTwoActionPerformed(java.awt.event.ActionEvent evt) {
         String player = Question2PlayerTwo.getText();
         q2Player2 = player;
-    }                                                  
+    }
 
-    private void Question3TeamActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        // TODO add your handling code here:
+    private void Question3TeamActionPerformed(java.awt.event.ActionEvent evt) {
         String team = Question3Team.getText();
         q3Team = team;
-    }                                             
+    }
 
-    private void Question4ConferenceActionPerformed(java.awt.event.ActionEvent evt) {                                                    
-        // TODO add your handling code here:
+    private void Question4ConferenceActionPerformed(java.awt.event.ActionEvent evt) {
         String conference = Question4Conference.getText();
         q4Conference = conference;
-    }                                                   
+    }
 
-    private void Question4SeasonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
+    private void Question4SeasonActionPerformed(java.awt.event.ActionEvent evt) {
         String season = Question4Season.getText();
         q4Season = season;
-    }                                               
+    }
 
-    private void Question1ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
+    private void Question1ButtonActionPerformed(java.awt.event.ActionEvent evt) {
         questionOne();
-    }                                               
+    }
 
-    private void Question2ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
+    private void Question2ButtonActionPerformed(java.awt.event.ActionEvent evt) {
         questionTwo();
-    }                                               
+    }
 
-    private void Question3ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
+    private void Question3ButtonActionPerformed(java.awt.event.ActionEvent evt) {
         questionThree();
-    }                                               
+    }
 
-    private void Question4ButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
-        // TODO add your handling code here:
+    private void Question4ButtonActionPerformed(java.awt.event.ActionEvent evt) {
         questionFour();
-    }                                               
+    }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -1046,7 +1210,7 @@ public class Phase4GUI extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Phase4GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        
+
         // Open connection with the database
         conn = null;
         try {
@@ -1080,8 +1244,8 @@ public class Phase4GUI extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify   
-    private static Connection conn; // Added manually, not through Netbeans                   
+    // Variables declaration - do not modify
+    private static Connection conn; // Added manually, not through Netbeans
     private javax.swing.JButton Question1Button;
     private javax.swing.JTextField Question1Team2;
     private javax.swing.JTextField Question1TeamOne;
@@ -1112,5 +1276,5 @@ public class Phase4GUI extends javax.swing.JFrame {
     private javax.swing.JCheckBox outputFile;
     private javax.swing.JButton searchButton;
     private javax.swing.JTextField textBox;
-    // End of variables declaration                   
+    // End of variables declaration
 }
