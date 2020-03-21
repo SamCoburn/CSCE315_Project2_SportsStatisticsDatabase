@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileWriter;
+import java.util.*;
+import java.io.*;
 
 public class Phase4GUI extends javax.swing.JFrame {
     // Global Variables Declared for Phase 3
@@ -610,7 +612,295 @@ public class Phase4GUI extends javax.swing.JFrame {
         }
     }
 
-    private void questionOne() {
+    private String findChain(String team1, String team2,String str)
+    {
+        System.out.println("CHAIN START");
+        ArrayList<String> leftmiddleList = new ArrayList<String>();
+        ArrayList<String> rightmiddleList = new ArrayList<String>(); 
+
+        StringBuilder temp = new StringBuilder ();
+        temp.append(str);
+        if(!victoryChain(team1, team2, temp))
+        {           
+            for(int i = gamecodeList.size()-1;i>=0;i--)
+            {
+                System.out.println("CYCLE");
+                boolean foundVictoryChain = false;
+                if(team1List.get(i).equals(team1))
+                {
+                    if(leftmiddleList.indexOf(team2List.get(i)) == -1)
+                    {
+                        leftmiddleList.add(team2List.get(i));
+                    }
+                    foundVictoryChain = victoryChain(team2List.get(i),team2,temp);
+                    if(foundVictoryChain)
+                    {
+                        System.out.println("CHAIN OUT");
+                        foundTheConnection = true;
+                        return team1 + " beat " + team2List.get(i) + " "+ seasonList.get(i) + ", "+temp.toString();                        
+                    }
+                }
+                if(team2List.get(i).equals(team2))
+                {
+                    if(rightmiddleList.indexOf(team1List.get(i)) == -1)
+                    {
+                        rightmiddleList.add(team1List.get(i));
+                    }
+                }
+            }
+
+            for(int i = 0;i<leftmiddleList.size();i++)
+            {
+                for(int j = 0; i<rightmiddleList.size();i++)
+                {
+                    if(victoryChain(leftmiddleList.get(i), rightmiddleList.get(j), new StringBuilder()))
+                    {
+                        victoryChain(team1,leftmiddleList.get(i),temp);
+                        victoryChain(leftmiddleList.get(i), rightmiddleList.get(j),temp);
+                        victoryChain(rightmiddleList.get(j), team2,temp);
+                        foundTheConnection = true;
+                        return temp.toString();
+                    }
+                }
+            }
+
+            for(int i = 0;i<leftmiddleList.size();i++)
+            {
+                for(int j = 0; i<rightmiddleList.size();i++)
+                {      
+                    victoryChain(team1,leftmiddleList.get(i),temp);
+                    temp.append(findChain(leftmiddleList.get(i),rightmiddleList.get(i),temp.toString()));
+                    victoryChain(rightmiddleList.get(i),team2,temp);
+
+                    if(foundTheConnection)
+                    {
+                        foundTheConnection = true;
+                        return temp.toString();
+                    }
+                    else
+                    {
+                        temp = new StringBuilder();
+                    }
+                }
+            }
+            return "No Connection Exists";
+
+        }
+        else
+        {
+            foundTheConnection = true;
+            return temp.toString();
+        }
+    }
+    private boolean victoryChain(String team1, String team2, StringBuilder output)
+    {
+        System.out.println("VICTORY CHAIN");
+        int index = team1List.lastIndexOf(team1);
+        boolean found = false;
+        while(index != -1)
+        {
+            if(team2List.get(index).equals(team2))
+            {
+                System.out.println("FOUND VICTORY==============CHAIN");
+                output.append(team1 + " beat " + team2 + " " + seasonList.get(index)+ " ");
+                found = true;
+                break;
+            }
+            else
+            {
+                team1List.set(index,"nullvalue");
+                index = team1List.lastIndexOf(team1);
+            }            
+        }
+
+        index = team1List.lastIndexOf("nullvalue");
+        while(index != -1)
+        {
+            team1List.set(index,team1);
+            index = team1List.lastIndexOf("nullvalue");
+        }
+
+        if(found)
+        {
+            return true;          
+        }
+        return false;
+    }
+    private ArrayList<Long> gamecodeList = new ArrayList<Long>();
+    private ArrayList<String> team1List = new ArrayList<String>();
+    private ArrayList<String> team2List = new ArrayList<String>();
+    private ArrayList<Integer> offptsList = new ArrayList<Integer>();
+    private ArrayList<Integer> defptsList = new ArrayList<Integer>();       
+    private ArrayList<String> seasonList = new ArrayList<String>();
+    private boolean foundTheConnection = false;
+
+    private void questionOne() 
+    {
+        //creating the arraylists
+        if(gamecodeList.size()==0)
+        {
+            System.out.println("Seaching for bragging rights between "+ q1Team1 +" and "+q1Team2);    
+            String querry = "WITH CTE (\"Game Code \", \"name\", \"conference code\", \"name dup\", \"conference code dup\", \"Offense Points\",\"Defense Points\", \"Season\", DuplicateCount) ";
+            querry +="AS (SELECT \"Game Code \", \"name\", \"conference code\", \"name dup\", \"conference code dup\", \"Offense Points\",\"Defense Points\", \"Season\",";
+            querry +="ROW_NUMBER() OVER(PARTITION BY \"Game Code \", \"name\", \"name dup\",\"Season\" ORDER BY \"Offense Points\" DESC,\"Defense Points\" DESC) AS DuplicateCount FROM gameinfo3) "; 
+            querry +="SELECT * from CTE Where DuplicateCount = 1 ORDER BY \"Season\" ASC,\"Game Code \"ASC;";
+
+            System.out.println(querry);
+            String output = "";
+            //parrellel arraylist
+
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(querry);
+                //OUTPUT
+                JOptionPane.showMessageDialog(null,"Results from Query");
+                //System.out.println("______________________________________");
+                String gamecode = "";
+                String team1 = "";
+                String team2 = "";
+                String offpts = "";
+                String defpts = "";
+                String season = "";
+
+                while (result.next()) 
+                {    
+                    gamecode = result.getString("Game Code ");
+                    team1 = result.getString("name");
+                    team2 = result.getString("name dup");
+                    offpts = result.getString("Offense Points");
+                    defpts = result.getString("Defense Points");
+                    season = result.getString("Season");
+
+                    if(Integer.parseInt(offpts)<Integer.parseInt(defpts))
+                    {      
+                        gamecodeList.add(Long.parseLong(gamecode));
+                        team1List.add(team2);
+                        team2List.add(team1);
+                        offptsList.add(Integer.parseInt(defpts));
+                        defptsList.add(Integer.parseInt(offpts));
+                        seasonList.add(season);
+                        output += String.format("%-30s %-25s %-25s %-5s %-5s %-4s\n",gamecode,team2,team1,defpts,offpts,season);
+                    }
+                    else
+                    {                   
+                        gamecodeList.add(Long.parseLong(gamecode));
+                        team1List.add(team1);
+                        team2List.add(team2);
+                        offptsList.add(Integer.parseInt(offpts));
+                        defptsList.add(Integer.parseInt(defpts));
+                        seasonList.add(season);
+                        output += String.format("%-30s %-25s %-25s %-5s %-5s %-4s\n",gamecode,team1,team2,offpts,defpts,season);
+                    }
+                }
+                //System.out.println(output); //prints everything
+            }
+            catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            }            
+            for(int i = gamecodeList.size()-1;i>0;i--)
+            {
+                //first checks if gamecode, season, teamnames are the same
+                if( gamecodeList.get(i).equals(gamecodeList.get(i-1)) && seasonList.get(i).equals(seasonList.get(i-1)) && team1List.get(i).equals(team1List.get(i-1)) && team2List.get(i).equals(team2List.get(i-1)))
+                {
+                    //now checking for duplicates
+                    if(offptsList.get(i) == offptsList.get(i-1) && defptsList.get(i) == defptsList.get(i-1))
+                    {
+                        gamecodeList.remove(i);
+                        team1List.remove(i);
+                        team2List.remove(i);
+                        offptsList.remove(i);
+                        defptsList.remove(i);
+                        seasonList.remove(i);
+                    }
+                    else if(offptsList.get(i) >= offptsList.get(i-1) && defptsList.get(i) >= defptsList.get(i-1))
+                    {
+                        //delete i-1
+                        gamecodeList.remove(i-1);
+                        team1List.remove(i-1);
+                        team2List.remove(i-1);
+                        offptsList.remove(i-1);
+                        defptsList.remove(i-1);
+                        seasonList.remove(i-1);
+                    }
+                    else if(offptsList.get(i) <= offptsList.get(i-1) && defptsList.get(i) <= defptsList.get(i-1))
+                    {
+                        //delete i
+                        gamecodeList.remove(i);
+                        team1List.remove(i);
+                        team2List.remove(i);
+                        offptsList.remove(i);
+                        defptsList.remove(i);
+                        seasonList.remove(i);
+                    }
+                }
+            }  
+            //removes all the ties 
+            for(int i = gamecodeList.size()-1;i>0;i--)
+            {
+                if(offptsList.get(i) == defptsList.get(i))
+                {
+                    gamecodeList.remove(i);
+                    team1List.remove(i);
+                    team2List.remove(i);
+                    offptsList.remove(i);
+                    defptsList.remove(i);
+                    seasonList.remove(i);                   
+                }
+            }
+
+            String writeToFile = "";
+            for(int i =0;i<gamecodeList.size();i++)
+            {
+                writeToFile += gamecodeList.get(i) + "," + team1List.get(i) + "," + team2List.get(i) + "," + offptsList.get(i) + "," + defptsList.get(i) + "," + seasonList.get(i)+"\n";
+            }            
+            try (PrintWriter writer = new PrintWriter(new File("test.csv"))) {
+
+                writer.write(writeToFile);
+            } 
+            catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+            System.out.println(gamecodeList.size());           
+        }
+
+        //now checking the teams for connection
+        if(team1List.indexOf(q1Team1) == -1 && team2List.indexOf(q1Team1) == -1)
+        {
+            System.out.println("Team 1 name is invalid");
+        }
+        else if(team1List.indexOf(q1Team2) == -1 && team2List.indexOf(q1Team2) == -1)
+        {
+            System.out.println("Team 2 name is invalid");
+        }
+        else 
+        {
+            //both teams are valid
+
+            boolean found = false;
+            //checks for direct connection
+            for(int i = gamecodeList.size()-1;i>=0;i--)
+            {
+                if(team1List.get(i).equals(q1Team1) && team2List.get(i).equals(q1Team2))
+                {
+                    System.out.println(q1Team1+" beat "+q1Team2 + " " + seasonList.get(i));
+                    found = true;
+                    break;
+                }
+            }
+            if(!found)
+            {            
+                System.out.println("Direct Connection does not exist");
+                //checks for indirect connection
+                System.out.println(findChain(q1Team1,q1Team2,""));            
+            }
+            System.out.println(gamecodeList.size());
+            foundTheConnection = false;
+        }
+        
+
+        
 
     }
 
