@@ -1051,7 +1051,7 @@ public class Phase4GUI extends javax.swing.JFrame {
         conn = null;
         try {
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection("jdbc:postgresql://csce-315-db.engr.tamu.edu/team19_907", "sam_coburn32", "725009869");
+            conn = DriverManager.getConnection("jdbc:postgresql://csce-315-db.engr.tamu.edu/team19_907", "joeychou99", "727003256");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
