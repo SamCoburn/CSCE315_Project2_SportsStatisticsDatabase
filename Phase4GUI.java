@@ -614,7 +614,6 @@ public class Phase4GUI extends javax.swing.JFrame {
 
     private String findChain(String team1, String team2,String str)
     {
-        System.out.println("CHAIN START");
         ArrayList<String> leftmiddleList = new ArrayList<String>();
         ArrayList<String> rightmiddleList = new ArrayList<String>(); 
 
@@ -624,7 +623,6 @@ public class Phase4GUI extends javax.swing.JFrame {
         {           
             for(int i = gamecodeList.size()-1;i>=0;i--)
             {
-                System.out.println("CYCLE");
                 boolean foundVictoryChain = false;
                 if(team1List.get(i).equals(team1))
                 {
@@ -635,7 +633,6 @@ public class Phase4GUI extends javax.swing.JFrame {
                     foundVictoryChain = victoryChain(team2List.get(i),team2,temp);
                     if(foundVictoryChain)
                     {
-                        System.out.println("CHAIN OUT");
                         foundTheConnection = true;
                         return team1 + " beat " + team2List.get(i) + " "+ seasonList.get(i) + ", "+temp.toString();                        
                     }
@@ -694,14 +691,12 @@ public class Phase4GUI extends javax.swing.JFrame {
     }
     private boolean victoryChain(String team1, String team2, StringBuilder output)
     {
-        System.out.println("VICTORY CHAIN");
         int index = team1List.lastIndexOf(team1);
         boolean found = false;
         while(index != -1)
         {
             if(team2List.get(index).equals(team2))
             {
-                System.out.println("FOUND VICTORY==============CHAIN");
                 output.append(team1 + " beat " + team2 + " " + seasonList.get(index)+ " ");
                 found = true;
                 break;
@@ -736,10 +731,10 @@ public class Phase4GUI extends javax.swing.JFrame {
 
     private void questionOne() 
     {
+        System.out.println("Searching for connection: "+ q1Team1 + " vs " + q1Team2);
         //creating the arraylists
         if(gamecodeList.size()==0)
         {
-            System.out.println("Seaching for bragging rights between "+ q1Team1 +" and "+q1Team2);    
             String querry = "WITH CTE (\"Game Code \", \"name\", \"conference code\", \"name dup\", \"conference code dup\", \"Offense Points\",\"Defense Points\", \"Season\", DuplicateCount) ";
             querry +="AS (SELECT \"Game Code \", \"name\", \"conference code\", \"name dup\", \"conference code dup\", \"Offense Points\",\"Defense Points\", \"Season\",";
             querry +="ROW_NUMBER() OVER(PARTITION BY \"Game Code \", \"name\", \"name dup\",\"Season\" ORDER BY \"Offense Points\" DESC,\"Defense Points\" DESC) AS DuplicateCount FROM gameinfo3) "; 
@@ -756,7 +751,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                 ResultSet result = stmt.executeQuery(querry);
                 //OUTPUT
                 JOptionPane.showMessageDialog(null,"Results from Query");
-                //System.out.println("______________________________________");
+                System.out.println("==========================================");
                 String gamecode = "";
                 String team1 = "";
                 String team2 = "";
@@ -862,28 +857,31 @@ public class Phase4GUI extends javax.swing.JFrame {
             catch (FileNotFoundException e) {
                 System.out.println(e.getMessage());
             }
-            System.out.println(gamecodeList.size());           
         }
 
+        String output = "";
         //now checking the teams for connection
         if(team1List.indexOf(q1Team1) == -1 && team2List.indexOf(q1Team1) == -1)
         {
+            output = "Team 1 name is invalid";
             System.out.println("Team 1 name is invalid");
         }
         else if(team1List.indexOf(q1Team2) == -1 && team2List.indexOf(q1Team2) == -1)
         {
+            output = "Team 2 name is invalid";
             System.out.println("Team 2 name is invalid");
         }
         else 
         {
             //both teams are valid
-
             boolean found = false;
+
             //checks for direct connection
             for(int i = gamecodeList.size()-1;i>=0;i--)
             {
                 if(team1List.get(i).equals(q1Team1) && team2List.get(i).equals(q1Team2))
                 {
+                    output = q1Team1+" beat "+q1Team2 + " " + seasonList.get(i);
                     System.out.println(q1Team1+" beat "+q1Team2 + " " + seasonList.get(i));
                     found = true;
                     break;
@@ -891,18 +889,21 @@ public class Phase4GUI extends javax.swing.JFrame {
             }
             if(!found)
             {            
-                System.out.println("Direct Connection does not exist");
                 //checks for indirect connection
-                System.out.println(findChain(q1Team1,q1Team2,""));            
+                output = findChain(q1Team1,q1Team2,"");
+                System.out.println(output);            
             }
-            System.out.println(gamecodeList.size());
-            foundTheConnection = false;
+            //System.out.println(gamecodeList.size());
+            
         }
-        
+        foundTheConnection = false;
+        JOptionPane.showMessageDialog(null,output);
+
 
         
 
     }
+
 
     private void questionTwo() {
 
