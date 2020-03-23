@@ -938,15 +938,329 @@ public class Phase4GUI extends javax.swing.JFrame {
         }
         foundTheConnection = false;
         JOptionPane.showMessageDialog(null,output);
-
-
-
-
     }
 
+    private ArrayList<Long> q2gamecodeList = new ArrayList<Long>();
+    private ArrayList<String> q2team1codeList = new ArrayList<String>();
+    private ArrayList<String> q2team2codeList = new ArrayList<String>();
+    private ArrayList<String> q2team1List = new ArrayList<String>();
+    private ArrayList<String> q2team2List = new ArrayList<String>();
+    private ArrayList<String> q2seasonList = new ArrayList<String>();
+    
+    private ArrayList<Long> q2playercodeList = new ArrayList<Long>();
+    private ArrayList<String> q2playerfirstnameList = new ArrayList<String>();
+    private ArrayList<String> q2playerlastnameList = new ArrayList<String>();
+    private ArrayList<String> q2playerteamcodeList = new ArrayList<String>();
+    private ArrayList<String> q2playerhometownList = new ArrayList<String>();
+    private ArrayList<String> q2playerhomestateList = new ArrayList<String>();
+    private ArrayList<String> q2playerseasonList = new ArrayList<String>();
 
-    private void questionTwo() {
+    private ArrayList<String> q2teamcodeList = new ArrayList<String>();
+    private ArrayList<String> q2teamnameList = new ArrayList<String>();
+    
+    private String findConnection(String p1firstName, String p1lastName, String p2firstName, String p2lastName)
+    {
+        String output = "";
 
+        //finding a hometown match
+        for(int i = q2playercodeList.size()-1;i>=0;i--)
+        {
+            if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName) && !q2playerhometownList.get(i).equals("Null"))
+            {
+                for(int j = q2playercodeList.size()-1;i>=0;i--)
+                {
+                    if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName) && !q2playerhomestateList.get(i).equals("Null") && q2playerhomestateList.get(i).equals(q2playerhomestateList.get(j)) && q2playerhometownList.get(i).equals(q2playerhometownList.get(j)))
+                    {
+                        output = p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " have the same HomeTown "+ q2playerhometownList.get(i) + " " + q2playerhomestateList.get(i) + "\n";
+                        break;
+                    }
+                }
+            }
+            else if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName) && !q2playerhometownList.get(i).equals("Null"))
+            {
+                for(int j = q2playercodeList.size()-1;i>=0;i--)
+                {
+                    if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName) && !q2playerhomestateList.get(i).equals("Null") && q2playerhomestateList.get(i).equals(q2playerhomestateList.get(j)) && q2playerhometownList.get(i).equals(q2playerhometownList.get(j)))
+                    {
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " have the same HomeTown "+ q2playerhometownList.get(i) + " " + q2playerhomestateList.get(i) + "\n";
+                        break;
+                    }
+                }
+            }
+        }
+
+        //finding matching teams
+        for(int i = q2playercodeList.size()-1;i>=0;i--)
+        { 
+            if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName))
+            {
+                for(int j = q2playercodeList.size()-1;i>=0;i--)
+                {
+                    if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName) && q2playerteamcodeList.get(i).equals(q2playerteamcodeList.get(j)))
+                    {                                           
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played on the same team " + q2teamnameList.get(q2teamcodeList.indexOf(q2playerteamcodeList.get(i)))+"\n";
+                        break;
+                    }
+                }
+            }
+            else if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName))
+            {
+                for(int j = q2playercodeList.size()-1;i>=0;i--)
+                {
+                    if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName) && q2playerteamcodeList.get(i).equals(q2playerteamcodeList.get(j)))
+                    {               
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played on the same team " + q2teamnameList.get(q2teamcodeList.indexOf(q2playerteamcodeList.get(i)))+"\n";
+                        break;
+                    }
+                }                
+            }
+        }
+
+        System.out.println("FINDING DIRECT CONNECTION");
+        //direct game played
+        for(int i = q2playercodeList.size()-1;i>=0;i--)
+        {
+            if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName))
+            {
+                for(int j = q2playercodeList.size()-1;i>=0;i--)
+                {
+                    if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName) && !q2playerteamcodeList.get(i).equals(q2playerteamcodeList.get(j)) && q2playerseasonList.get(i).equals(q2playerseasonList.get(j)) && PlayedEachOther(q2playerteamcodeList.get(i),q2playerteamcodeList.get(j),q2playerseasonList.get(i))!=-1 )
+                    {
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played against each other in "+ q2playerseasonList.get(i) + " "+ q2playerteamcodeList.get(i) +" vs "+ q2playerteamcodeList.get(j)  + "\n";
+                        break;
+                    }
+
+                }
+            }
+            else if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName))
+            {
+                for(int j = q2playercodeList.size()-1;i>=0;i--)
+                {
+                    if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName) && !q2playerteamcodeList.get(i).equals(q2playerteamcodeList.get(j)) && q2playerseasonList.get(i).equals(q2playerseasonList.get(j)) && PlayedEachOther(q2playerteamcodeList.get(i),q2playerteamcodeList.get(j),q2playerseasonList.get(i)) !=-1)
+                    {
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played against each other in "+ q2playerseasonList.get(i) + " "+ q2playerteamcodeList.get(i) +" vs "+ q2playerteamcodeList.get(j)  + "\n";
+                        break;                       
+                    }
+                }                
+            }
+        }
+        if(output == "")
+        {
+            return "No Connection Found";
+        }
+        else
+        {
+            return output;
+        }
+    }
+
+    private int PlayedEachOther(String teamcode1,String teamcode2,String season)
+    {
+        if(q2team1codeList.indexOf(teamcode1) != -1 && q2team2codeList.indexOf(teamcode2) != -1 && q2team2codeList.indexOf(teamcode1) !=-1 && q2team2codeList.indexOf(teamcode1) != -1)
+        {
+            for(int i = q2gamecodeList.size()-1; i>=0;i--)
+            {   
+                if(q2seasonList.get(i).equals(season))
+                {
+                    if( (q2team1codeList.get(i).equals(teamcode1) && q2team2codeList.get(i).equals(teamcode2) ) || (q2team1codeList.get(i).equals(teamcode2) && q2team2codeList.get(i).equals(teamcode1)))
+                    {
+                        return i;
+                    }
+                }
+            }           
+        }
+        return -1;
+    }
+
+    private void questionTwo()
+    {
+        q2playercodeList.clear();
+        q2playerfirstnameList.clear();
+        q2playerlastnameList.clear();
+        q2playerteamcodeList.clear();
+        q2playerhometownList.clear();
+        q2playerhomestateList.clear();
+        q2playerseasonList.clear();
+
+        System.out.println("Searching for connection: "+ q2Player1 + " vs " + q2Player2);
+        if(q2gamecodeList.size() == 0)
+        {
+            String querry = "WITH CTE (\"Game Code \", \"name\", \"name dup\", \"Offense Team Code\", \"Defense Team Code\", \"Season\", DuplicateCount)";
+            querry +="AS (SELECT \"Game Code \", \"name\", \"name dup\", \"Offense Team Code\", \"Defense Team Code\", \"Season\",";
+            querry +="ROW_NUMBER() OVER(PARTITION BY \"Game Code \", \"name\", \"name dup\",\"Season\" ORDER BY \"Offense Points\" DESC,\"Defense Points\" DESC) AS DuplicateCount ";
+            querry +="FROM gameinfo3) SELECT * from CTE Where DuplicateCount = 1 ORDER BY \"Season\" ASC, \"Game Code \" ASC;";
+        
+            System.out.println(querry);
+            //parrellel arraylist
+        
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(querry);
+                //OUTPUT
+                JOptionPane.showMessageDialog(null,"Results from Query");
+                System.out.println("==========================================");
+
+                while (result.next())
+                {
+                    q2gamecodeList.add(Long.parseLong(result.getString("Game Code ")));
+                    q2team1codeList.add(result.getString("Offense Team Code"));
+                    q2team2codeList.add(result.getString("Defense Team Code"));
+                    q2team1List.add(result.getString("name"));
+                    q2team2List.add(result.getString("name dup"));
+                    q2seasonList.add(result.getString("Season"));
+                }
+            }
+            catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            }
+            for(int i = q2gamecodeList.size()-1;i>0;i--)
+            {
+                //first checks if gamecode same
+                if( q2gamecodeList.get(i).equals(q2gamecodeList.get(i-1)) )
+                {
+                    //now checking for duplicates
+                    q2gamecodeList.remove(i);
+                    q2team1codeList.remove(i);
+                    q2team2codeList.remove(i);
+                    q2team1List.remove(i);
+                    q2team2List.remove(i);
+                    q2seasonList.remove(i);
+                }
+            }
+            String writeToFile = "";
+            for(int i =0;i<q2gamecodeList.size();i++)
+            {
+                writeToFile += q2gamecodeList.get(i) + "," + q2team1codeList.get(i) + "," + q2team2codeList.get(i) + "," + q2team1List.get(i) + "," + q2team2List.get(i) + "," + q2seasonList.get(i)+"\n";
+            }
+            try (PrintWriter writer = new PrintWriter(new File("test2.csv"))) {
+
+                writer.write(writeToFile);
+            }
+            catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        if(q2teamcodeList.size() == 0)
+        {
+            String querry = "SELECT \"team code\", \"name\" FROM team;";
+            System.out.println(querry);
+            //parrellel arraylist
+        
+            try{
+                //create a statement object
+                Statement stmt = conn.createStatement();
+                //send statement to DBMS
+                ResultSet result = stmt.executeQuery(querry);
+                //OUTPUT
+                JOptionPane.showMessageDialog(null,"Results from Query");
+                System.out.println("==========================================");
+
+                while (result.next())
+                {
+                    q2teamcodeList.add(result.getString("team code"));
+                    q2teamnameList.add(result.getString("name"));
+                }
+            }
+            catch (Exception e){
+                JOptionPane.showMessageDialog(null,"Error accessing Database.");
+            }
+        }
+
+        String p1firstName = q2Player1.substring(0,q2Player1.indexOf(" "));
+        String p1lastName = q2Player1.substring(q2Player1.indexOf(" ")+1);
+        String p2firstName = q2Player2.substring(0,q2Player2.indexOf(" "));
+        String p2lastName = q2Player2.substring(q2Player2.indexOf(" ")+1);
+        boolean validNames = false;
+        String querry = "SELECT \"Player Code\", \"Team Code\",\"First Name \",\"Last Name\", \"Home Town\", \"Home State\",\"Season\" FROM player ";
+        querry+="WHERE (\"First Name \" = \'"+ p1firstName + "\' AND \"Last Name\" = \'" + p1lastName + "\') OR (\"First Name \" = \'"+ p2firstName + "\' AND \"Last Name\" = \'" + p2lastName + "\')";
+        querry+="ORDER BY \"Season\" ASC;";
+        System.out.println(querry);
+        String writeToFile = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(querry);
+            //OUTPUT
+            JOptionPane.showMessageDialog(null,"Results from Query");
+            System.out.println("========================================================");
+            while (result.next())
+            {
+                q2playercodeList.add(Long.parseLong(result.getString("Player Code")));
+                writeToFile += result.getString("Player Code") + ",";
+                            
+                q2playerteamcodeList.add(result.getString("Team Code"));
+                writeToFile += result.getString("Team Code") + ",";                   
+                
+                if(q2teamcodeList.indexOf(Long.parseLong(result.getString("Team Code")))!=-1)
+                {
+                    writeToFile += q2teamnameList.get(q2teamcodeList.indexOf(Long.parseLong(result.getString("Team Code")))) + ",";
+                }
+                else 
+                {
+                    writeToFile += "No team info,";
+                }
+    
+                q2playerfirstnameList.add(result.getString("First Name "));
+                writeToFile += result.getString("First Name ") + ",";
+                
+                q2playerlastnameList.add(result.getString("Last Name"));
+                writeToFile += result.getString("Last Name") + ",";
+
+                q2playerseasonList.add(result.getString("Season"));
+                writeToFile += result.getString("Season") + ",";
+                
+                if(result.getString("Home Town") == null)
+                {
+                    q2playerhometownList.add("Null");
+                    writeToFile += "Null,";
+                }
+                else 
+                {
+                    q2playerhometownList.add(result.getString("Home Town"));
+                    writeToFile += result.getString("Home Town") + ",";
+                }
+                if(result.getString("Home State")==null)
+                {
+                    q2playerhomestateList.add("Null");
+                    writeToFile += "Null,";
+                }
+                else 
+                {
+                    q2playerhomestateList.add(result.getString("Home State"));
+                    writeToFile += result.getString("Home State") + ",";
+                }
+                writeToFile +="\n";
+            }
+        }
+        catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing Database. x2");
+        }
+        try (PrintWriter writer = new PrintWriter(new File("test3.csv"))) 
+        {
+            writer.write(writeToFile);
+        }
+        catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("Number of teams "+q2gamecodeList.size());
+        System.out.println("Number of unique players "+q2playercodeList.size());
+        //may not cover all cases 
+        if(q2playerfirstnameList.indexOf(p1firstName) != -1 && q2playerfirstnameList.indexOf(p2firstName) != -1 && q2playerlastnameList.indexOf(p2lastName) != -1 && q2playerlastnameList.indexOf(p1lastName) != -1)
+        {
+            validNames = true;
+        }
+        if(validNames)
+        {
+            System.out.println("Ouput:\n"+findConnection(p1firstName, p1lastName, p2firstName, p2lastName));
+        }
+        else
+        {
+            System.out.println("Invalid player names");
+        }
     }
 
     private void questionThree() {
