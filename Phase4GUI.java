@@ -9,7 +9,6 @@ import java.io.*;
 /*
     TERMINAL COMMANDS TO COMPILE AND RUN:
     javac -cp .:postgresql-42.2.8.jar Phase4GUI.java
-
     java -cp .:postgresql-42.2.8.jar Phase4GUI
 */
 
@@ -1413,7 +1412,223 @@ public class Phase4GUI extends javax.swing.JFrame {
     }
 
     private void questionFour() {
+    	//q4Conference and q4Season are global strings of the user inputs
+    	
+    	//get conference code of searched conference and season
+    	String getcode = "SELECT code FROM public.conference WHERE season = " +q4Season+ " and name = \'" + q4Conference + "\';";
+        String  code = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(getcode);
+            //OUTPUT
+            while (result.next()) {
+                code += result.getString("code");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing conference codes.");
+        }
+        
+        System.out.println("Calculating Home Team Advantage...");
+    	
+       
+      //grab all teams from season and conference
+    	String getHomeTeams = "SELECT DISTINCT game.\"Home Team Code\" FROM team JOIN game on team.\"team code\" = game.\"Home Team Code\" and team.season = game.\"Season\" where season = " +q4Season+ " and \"conference code\" = " +code+ " order by \"Home Team Code\";" ;
+    	//System.out.println(getHomeTeams);
+    	String  HomeTeamCodes = "";
+    	String  numPlays = "";
+    	String attendance = "";
+    	String points = "";
+    	String rushYards = "";
+        try{
+            //create a statement object
+            Statement stmt = conn.createStatement();
+            //send statement to DBMS
+            ResultSet result = stmt.executeQuery(getHomeTeams);
+            //OUTPUT
+            //System.out.println("______________________________________");
+            if(!result.next()) {
+            	throw new Exception("Error");
+            }
+            while (result.next()) {
+            	//System.out.println(result.getInt("Home Team Code"));
+            	//find total number of plays for each team during home games
+            	String getNumPlays = "select count(play.\"Play Number\") from play join game on play.\"Game Code \" = game.\"Game Code\" where game.\"Home Team Code\" = " +result.getString("Home Team Code")+ " and game.\"Season\" = " +q4Season+ ";";
+            	//System.out.println(getNumPlays);
+            	
+                try{
+                    //create a statement object
+                    Statement stmt2 = conn.createStatement();
+                    //send statement to DBMS
+                    ResultSet result2 = stmt2.executeQuery(getNumPlays);
+                    //OUTPUT
+                    //System.out.println("______________________________________");
+                    while (result2.next()) {
+                    	//System.out.println(result.getInt("Home Team Code"));
+                    	numPlays += result2.getString("count") + " ";
+                    }
+                } catch (Exception e){
+                    JOptionPane.showMessageDialog(null,"Error accessing number of plays.");
+                }
+                
+                //find total home game attendance
+                String getAttendance = "select sum(\"game statistics\".\"Attendance\") from game join \"game statistics\" on game.\"Game Code\" = \"game statistics\".\"Game Code\" where game.\"Home Team Code\" = " +result.getString("Home Team Code")+ " and \"game statistics\".\"Season\" = " +q4Season+";";
+                //System.out.println(getAttendance);
+                try{
+                    //create a statement object
+                    Statement stmt3 = conn.createStatement();
+                    //send statement to DBMS
+                    ResultSet result3 = stmt3.executeQuery(getAttendance);
+                    //OUTPUT
+                    //System.out.println("______________________________________");
+                    while (result3.next()) {
+                    	//System.out.println(result.getInt("Home Team Code"));
+                    	attendance += result3.getString("sum") + " ";
+                    }
+                } catch (Exception e){
+                    JOptionPane.showMessageDialog(null,"Error accessing attendance.");
+                }
+                
+                
+                String getPoints = "select sum(\"Points\") from \"Team Game Statistics\" join game on \"Team Game Statistics\".\"Game Code\" = game.\"Game Code\" where game.\"Home Team Code\" = " +result.getString("Home Team Code")+ " and \"Team Game Statistics\".\"Team Code\" = " +result.getString("Home Team Code")+ " and game.\"Season\" = " +q4Season+";";
+                try{
+                    //create a statement object
+                    Statement stmt4 = conn.createStatement();
+                    //send statement to DBMS
+                    ResultSet result4 = stmt4.executeQuery(getPoints);
+                    //OUTPUT
+                    //System.out.println("______________________________________");
+                    while (result4.next()) {
+                    	//System.out.println(result.getInt("Home Team Code"));
+                    	points += result4.getString("sum") + " ";
+                    }
+                } catch (Exception e){
+                    JOptionPane.showMessageDialog(null,"Error accessing points.");
+                }
+                
+                
+                String getRush = "select sum(\"Rush Yard\") from \"Team Game Statistics\" join game on \"Team Game Statistics\".\"Game Code\" = game.\"Game Code\" where game.\"Home Team Code\" = " +result.getString("Home Team Code")+ " and \"Team Game Statistics\".\"Team Code\" = " +result.getString("Home Team Code")+ " and game.\"Season\" = " +q4Season+";";
+                try{
+                    //create a statement object
+                    Statement stmt5 = conn.createStatement();
+                    //send statement to DBMS
+                    ResultSet result5 = stmt5.executeQuery(getRush);
+                    //OUTPUT
+                    //System.out.println("______________________________________");
+                    while (result5.next()) {
+                    	//System.out.println(result.getInt("Home Team Code"));
+                    	rushYards += result5.getString("sum") + " ";
+                    }
+                } catch (Exception e){
+                    JOptionPane.showMessageDialog(null,"Error accessing rush yard data.");
+                }
+                
+                HomeTeamCodes += result.getString("Home Team Code") + " ";
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"There is not enough data to compute the home team advantage for this conference. Choose another conference.");
+        }
+        String[] splitHome = HomeTeamCodes.split(" ");
+        String[] splitPlays = numPlays.split(" ");
+        int[] intPlays = new int[splitHome.length];
+        String[] splitAttendance = attendance.split(" ");
+        int[] intAttendance = new int[splitHome.length];
+        String[] splitPoints = points.split(" ");
+        int[] intPoints = new int[splitHome.length];
+        String[] splitYards = rushYards.split(" ");
+        int[] intYards = new int[splitHome.length];
+        double[] advantages = new double[splitHome.length];
 
+        for(int i = 0; i <splitHome.length; i++) {
+        	String x = splitPlays[i];
+        	intPlays[i] = Integer.parseInt(x);
+        	
+        	String y = splitAttendance[i];
+        	intAttendance[i] = Integer.parseInt(y);
+        	
+        	String z = splitPoints[i];
+        	intPoints[i] = Integer.parseInt(z);
+        	
+        	String a = splitYards[i];
+        	intYards[i] = Integer.parseInt(a);
+        }
+        
+        //calculating adv based on max plays
+        double maxPlays = intPlays[0];
+        for(int i = 1; i <splitHome.length; i++) {
+        	if(maxPlays <intPlays[i])
+        		maxPlays = intPlays[i];
+        }
+        for(int i = 0; i <splitHome.length; i++) {
+        	if(maxPlays == intPlays[i])
+        		advantages[i] = 20;
+        	else
+        		advantages[i] = (intPlays[i] / maxPlays)*20;
+        }
+        
+        
+        //calculating adv based on  max attendance
+        double maxAtten = intAttendance[0];
+        for(int i = 1; i <splitHome.length; i++) {
+        	if(maxAtten <intAttendance[i])
+        		maxAtten = intAttendance[i];
+        }
+        for(int i = 0; i <splitHome.length; i++) {
+        	if(maxAtten == intAttendance[i])
+        		advantages[i] += 30;
+        	else
+        		advantages[i] += (intAttendance[i] / maxAtten)*30;
+        }
+        
+        //calculating adv based on  max points
+        double maxPoints = intPoints[0];
+        for(int i = 1; i <splitHome.length; i++) {
+        	if(maxPoints <intPoints[i])
+        		maxPoints = intPoints[i];
+        }
+        for(int i = 0; i <splitHome.length; i++) {
+        	if(maxPoints == intPoints[i])
+        		advantages[i] += 30;
+        	else
+        		advantages[i] += (intPoints[i] / maxPoints)*30;
+        }
+        
+        //calculating adv based on  max rushed yards
+        double maxYards = intYards[0];
+        for(int i = 1; i <splitHome.length; i++) {
+        	if(maxYards <intYards[i])
+        		maxYards = intYards[i];
+        }
+        for(int i = 0; i <splitHome.length; i++) {
+        	if(maxYards == intYards[i])
+        		advantages[i] += 20;
+        	else
+        		advantages[i] += (intYards[i] / maxYards)*20;
+        }
+        
+        
+        //outputting team names and home field advantage scores in dialog box
+        String output = "";
+        String teamName = "select distinct Name from team where season = " +q4Season+ " and \"conference code\" = " +code+ ";";
+        int i = 0;
+
+        try{
+            //create a statement object
+            Statement stmtfinal = conn.createStatement();
+            //send statement to DBMS
+            ResultSet resultfinal = stmtfinal.executeQuery(teamName);
+            while (resultfinal.next() && i <splitHome.length) {
+            	output += resultfinal.getString("name") + " - " + advantages[i]+ "\n";
+            	i++;
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error accessing team names.");
+        }
+        
+        //final output
+        JOptionPane.showMessageDialog(null,output);
+     
     }
 
     private void textBoxActionPerformed(java.awt.event.ActionEvent evt) {
