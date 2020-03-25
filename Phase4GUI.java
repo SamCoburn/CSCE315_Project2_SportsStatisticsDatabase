@@ -1025,7 +1025,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                 {
                     if(q2playerfirstnameList.get(i).equals(p2firstName) && q2playerlastnameList.get(i).equals(p2lastName) && !q2playerteamcodeList.get(i).equals(q2playerteamcodeList.get(j)) && q2playerseasonList.get(i).equals(q2playerseasonList.get(j)) && PlayedEachOther(q2playerteamcodeList.get(i),q2playerteamcodeList.get(j),q2playerseasonList.get(i))!=-1 )
                     {
-                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played against each other in "+ q2playerseasonList.get(i) + " "+ q2playerteamcodeList.get(i) +" vs "+ q2playerteamcodeList.get(j)  + "\n";
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played against each other in "+ q2playerseasonList.get(i) + ", "+ q2teamnameList.get(q2teamcodeList.indexOf(q2playerteamcodeList.get(i))) +" vs "+ q2teamnameList.get(q2teamcodeList.indexOf(q2playerteamcodeList.get(j)))  + "\n";
                         break;
                     }
 
@@ -1037,7 +1037,7 @@ public class Phase4GUI extends javax.swing.JFrame {
                 {
                     if(q2playerfirstnameList.get(i).equals(p1firstName) && q2playerlastnameList.get(i).equals(p1lastName) && !q2playerteamcodeList.get(i).equals(q2playerteamcodeList.get(j)) && q2playerseasonList.get(i).equals(q2playerseasonList.get(j)) && PlayedEachOther(q2playerteamcodeList.get(i),q2playerteamcodeList.get(j),q2playerseasonList.get(i)) !=-1)
                     {
-                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played against each other in "+ q2playerseasonList.get(i) + " "+ q2playerteamcodeList.get(i) +" vs "+ q2playerteamcodeList.get(j)  + "\n";
+                        output += p1firstName + " " + p1lastName +" and " + p2firstName + " " + p2lastName + " played against each other in "+ q2playerseasonList.get(i) + ", "+ q2teamnameList.get(q2teamcodeList.indexOf(q2playerteamcodeList.get(i))) +" vs "+ q2teamnameList.get(q2teamcodeList.indexOf(q2playerteamcodeList.get(j)))  + "\n";
                         break;                       
                     }
                 }                
@@ -1248,18 +1248,23 @@ public class Phase4GUI extends javax.swing.JFrame {
         System.out.println("Number of teams "+q2gamecodeList.size());
         System.out.println("Number of unique players "+q2playercodeList.size());
         //may not cover all cases 
+        String output = "";
         if(q2playerfirstnameList.indexOf(p1firstName) != -1 && q2playerfirstnameList.indexOf(p2firstName) != -1 && q2playerlastnameList.indexOf(p2lastName) != -1 && q2playerlastnameList.indexOf(p1lastName) != -1)
         {
             validNames = true;
         }
+
         if(validNames)
         {
             System.out.println("Ouput:\n"+findConnection(p1firstName, p1lastName, p2firstName, p2lastName));
+            output = findConnection(p1firstName, p1lastName, p2firstName, p2lastName);
         }
         else
         {
             System.out.println("Invalid player names");
+            output = "Invalid player names";
         }
+        JOptionPane.showMessageDialog(null,output);
     }
 
     private void questionThree() {
